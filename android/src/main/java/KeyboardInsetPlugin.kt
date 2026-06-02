@@ -27,6 +27,8 @@ class KeyboardInsetPlugin(private val activity: Activity) : Plugin(activity) {
                 val density = activity.resources.displayMetrics.density
                 val cssPx = (kbPx / density).roundToInt()
                 emit(cssPx, cssPx > 0)
+                val navCss = (navBottom / density).roundToInt()
+                emitInsets(navCss)
                 insets // do NOT consume — return unchanged
             }
         } else {
@@ -41,8 +43,12 @@ class KeyboardInsetPlugin(private val activity: Activity) : Plugin(activity) {
                 val threshold = 120 // dp; below this is nav/status bar, not keyboard
                 val effectiveCssPx = if (cssPx > threshold) cssPx else 0
                 emit(effectiveCssPx, effectiveCssPx > 0)
+                val navPx = ViewCompat.getRootWindowInsets(root)
+                    ?.getInsets(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
+                emitInsets((navPx / activity.resources.displayMetrics.density).roundToInt())
             }
         }
+        root.post { ViewCompat.requestApplyInsets(root) }
     }
 
     private fun emit(heightCssPx: Int, visible: Boolean) {
@@ -51,5 +57,9 @@ class KeyboardInsetPlugin(private val activity: Activity) : Plugin(activity) {
             put("visible", visible)
         }
         trigger("keyboard", payload)
+    }
+
+    private fun emitInsets(bottomCssPx: Int) {
+        trigger("insets", JSObject().apply { put("bottom", bottomCssPx) })
     }
 }

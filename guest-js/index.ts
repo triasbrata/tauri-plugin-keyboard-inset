@@ -10,3 +10,13 @@ export async function onKeyboardChange(
 ): Promise<PluginListener> {
   return addPluginListener('keyboard-inset', 'keyboard', handler)
 }
+
+export interface InsetsChangeEvent {
+  bottom: number
+}
+
+export async function onInsetsChange(
+  handler: (event: InsetsChangeEvent) => void
+): Promise<PluginListener> {
+  return addPluginListener('keyboard-inset', 'insets', handler)
+}

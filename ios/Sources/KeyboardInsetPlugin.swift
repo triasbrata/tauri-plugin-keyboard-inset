@@ -21,6 +21,7 @@ class KeyboardInsetPlugin: Plugin {
             name: UIResponder.keyboardWillHideNotification,
             object: nil
         )
+        emitInsets()
     }
 
     @objc private func keyboardWillChangeFrame(_ notification: Notification) {
@@ -36,6 +37,12 @@ class KeyboardInsetPlugin: Plugin {
 
     @objc private func keyboardWillHide(_ notification: Notification) {
         emit(0, false)
+        emitInsets()
+    }
+
+    @objc private func emitInsets() {
+        let bottom = webview?.window?.safeAreaInsets.bottom ?? 0
+        trigger("insets", data: ["bottom": Double(bottom)])
     }
 
     func emit(_ height: Double, _ visible: Bool) {
